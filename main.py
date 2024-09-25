@@ -5,6 +5,7 @@ from lib.downloadjar import download_from_version
 from lib.extractjar import extract_jar
 from lib.populate_db import populate_db
 from lib.db import dataCollection
+from lib.db import recipesCollection
 
 VERSION_MANIFEST_URL = "https://launchermeta.mojang.com/mc/game/version_manifest.json"
 UPDATE_CHECK_DELAY = 600
@@ -24,16 +25,23 @@ def ver_check ():
 
         found = dataCollection.find_one({"type": "latest_ver"})
         latestVer = resData["versions"][0]
-        if found and latestVer and latestVer["id"] != found["ver"]:
-            print("THERE'S A NEW VERSION!")
+
+        recipe_count = recipesCollection.count_documents({})
+
+        if found and latestVer["id"] != found["ver"]:
+            print("New version detected!")
             update_recipes(latestVer)
             return dataCollection.update_one({"type": "latest_ver"}, {"$set" : {"ver": latestVer["id"], "updateTime": datetime.now()}})
-        elif not found and latestVer:
+        elif not found:
             print("VERSION NOT FOUND, ASSUMING THIS IS FIRST EXECUTION, DB WILL BE REFRESHED")
             update_recipes(latestVer)
             dataCollection.insert_one({"type": "latest_ver", "ver": latestVer["id"]})
+        elif found and recipe_count < 500:
+            print("Version found and recipe count is lower than 500, assuming something went wrong when populating and retrying")
+            update_recipes(latestVer)
         else:
             print("No new update found.")
+
     except Exception as e:
         print(e)
         print("Something went wrong fetching latest version.")
