@@ -1,6 +1,7 @@
 from pymongo import MongoClient
+from config import config
 
-client = MongoClient("mongodb://localhost:27017")
+client = MongoClient(config["MONGODB_URL"])
 
 db = client["mc-recipe-scrape"]
 
