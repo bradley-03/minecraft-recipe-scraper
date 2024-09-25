@@ -36,3 +36,7 @@ python main.py
 ## Configuration
 
 All configuration options can be found in `config.py`. Edit to your liking.
+
+## How does it work?
+
+Minecraft jar files contain a directory that stores all recipes in json files. This app downloads the latest jar, extracts the recipe files and stores them all into your database.
