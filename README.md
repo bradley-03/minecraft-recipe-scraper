@@ -1,1 +1,1 @@
-"# minecraft-recipe-scraper" 
+# minecraft-recipe-scraper
